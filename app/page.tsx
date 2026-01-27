@@ -22,7 +22,7 @@ export default function MochiBoard() {
 
   const saveSettings = () => {
     localStorage.setItem("mochi_knowledge_base", knowledge);
-    alert("Mochi's brain has been updated! 🍡");
+    alert("Mochi Board Updated! 🍡");
     setShowAdmin(false);
     setIsUnlocked(false);
     setPassInput("");
@@ -30,7 +30,7 @@ export default function MochiBoard() {
 
   const handleAskMochi = async () => {
     if (!userInput.trim()) return;
-    if (!knowledge) return alert("Please set up the Knowledge Base in Admin first!");
+    if (!knowledge) return alert("Knowledge base empty! Visit Admin.");
 
     const newChat = [...chat, { role: 'user' as const, text: userInput }];
     setChat(newChat);
@@ -38,103 +38,96 @@ export default function MochiBoard() {
     setLoading(true);
 
     try {
-      // SECURE CALL: We call our own API route
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userInput, knowledge }),
       });
-
       const data = await response.json();
-      
-      if (data.error) throw new Error(data.error);
-
       setChat([...newChat, { role: 'ai', text: data.text }]);
     } catch (error) {
-      setChat([...newChat, { role: 'ai', text: "Mochi's connection is lagging. Try again?" }]);
+      setChat([...newChat, { role: 'ai', text: "Connection error." }]);
     } finally {
       setLoading(false);
     }
   };
 
+  // --- Inline Styles ---
+  const styles = {
+    container: { minHeight: '100 screen', backgroundColor: '#fafaf9', padding: '20px', fontFamily: 'sans-serif' },
+    nav: { maxWidth: '800px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '20px', borderBottom: '1px solid #fed7aa' },
+    logo: { fontSize: '24px', fontWeight: 'bold', color: '#ea580c' },
+    adminBtn: { fontSize: '12px', color: '#94a3b8', border: 'none', background: 'none', cursor: 'pointer', textTransform: 'uppercase' as const },
+    chatBox: { maxWidth: '800px', margin: '40px auto', height: '60vh', overflowY: 'auto' as const, display: 'flex', flexDirection: 'column' as const, gap: '15px' },
+    userMsg: { alignSelf: 'flex-end', backgroundColor: '#ea580c', color: 'white', padding: '12px 18px', borderRadius: '20px 20px 0 20px', maxWidth: '80%', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' },
+    aiMsg: { alignSelf: 'flex-start', backgroundColor: 'white', border: '1px solid #fed7aa', padding: '12px 18px', borderRadius: '20px 20px 20px 0', maxWidth: '80%', color: '#475569' },
+    inputArea: { maxWidth: '800px', margin: '0 auto', display: 'flex', gap: '10px', position: 'relative' as const },
+    input: { flex: 1, padding: '16px 24px', borderRadius: '15px', border: '1px solid #fed7aa', outline: 'none', fontSize: '16px', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' },
+    sendBtn: { backgroundColor: '#ea580c', color: 'white', border: 'none', padding: '0 25px', borderRadius: '15px', fontWeight: 'bold', cursor: 'pointer' },
+    modal: { position: 'fixed' as const, inset: 0, backgroundColor: 'rgba(15, 23, 42, 0.7)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 },
+    modalContent: { backgroundColor: 'white', padding: '40px', borderRadius: '30px', width: '90%', maxWidth: '500px', textAlign: 'center' as const },
+    textarea: { width: '100%', height: '200px', marginTop: '20px', padding: '15px', borderRadius: '10px', border: '1px solid #cbd5e1', outline: 'none' }
+  };
+
   return (
-    <div className="min-h-screen bg-[#fafaf9] text-slate-800 p-4">
-      {/* Navigation */}
-      <nav className="max-w-3xl mx-auto flex justify-between items-center py-6 border-b border-orange-100">
-        <div className="flex items-center gap-2">
-          <span className="text-2xl text-orange-500">🍡</span>
-          <h1 className="text-xl font-bold text-orange-600 tracking-tight">The Mochi Board</h1>
-        </div>
-        <button onClick={() => setShowAdmin(true)} className="text-xs font-bold text-slate-400 hover:text-orange-500 tracking-widest uppercase">Admin</button>
+    <div style={styles.container}>
+      <nav style={styles.nav}>
+        <div style={styles.logo}>🍡 The Mochi Board</div>
+        <button style={styles.adminBtn} onClick={() => setShowAdmin(true)}>Manage</button>
       </nav>
 
-      {/* Chat Area */}
-      <main className="max-w-3xl mx-auto mt-8 flex flex-col h-[70vh]">
-        <div className="flex-1 overflow-y-auto space-y-4 mb-6 pr-2">
-          {chat.length === 0 && (
-            <div className="text-center py-20 opacity-30">
-              <p className="text-6xl mb-4">🍡</p>
-              <p className="text-lg">Ask me about the project's whitepaper or roadmap.</p>
-            </div>
-          )}
-          {chat.map((msg, i) => (
-            <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[85%] px-5 py-3 rounded-2xl shadow-sm border ${
-                msg.role === 'user' ? 'bg-orange-500 text-white border-transparent rounded-br-none' : 'bg-white border-orange-100 rounded-tl-none text-slate-700'
-              }`}>
-                {msg.text}
-              </div>
-            </div>
-          ))}
-          {loading && <div className="text-xs text-orange-400 animate-pulse font-bold">Mochi is thinking...</div>}
-        </div>
-
-        {/* Input Bar */}
-        <div className="relative">
-          <input 
-            className="w-full bg-white border border-orange-200 rounded-2xl py-4 pl-6 pr-16 shadow-lg focus:ring-2 focus:ring-orange-400 outline-none"
-            placeholder="Type a question..."
-            value={userInput}
-            onChange={(e) => setUserInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleAskMochi()}
-          />
-          <button onClick={handleAskMochi} className="absolute right-3 top-2.5 bg-orange-500 text-white w-10 h-10 rounded-xl flex items-center justify-center shadow-md hover:bg-orange-600 transition-colors">
-            →
-          </button>
-        </div>
+      <main style={styles.chatBox}>
+        {chat.length === 0 && (
+          <div style={{ textAlign: 'center', marginTop: '100px', color: '#94a3b8' }}>
+            <h1 style={{ fontSize: '50px' }}>🍡</h1>
+            <p>I'm Mochi. Ask me about the project!</p>
+          </div>
+        )}
+        {chat.map((msg, i) => (
+          <div key={i} style={msg.role === 'user' ? styles.userMsg : styles.aiMsg}>
+            {msg.text}
+          </div>
+        ))}
+        {loading && <div style={{ color: '#fb923c', fontSize: '12px', fontWeight: 'bold' }}>Mochi is thinking...</div>}
       </main>
 
-      {/* Admin Modal */}
+      <div style={styles.inputArea}>
+        <input 
+          style={styles.input} 
+          placeholder="What's the tokenomics?" 
+          value={userInput} 
+          onChange={(e) => setUserInput(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && handleAskMochi()}
+        />
+        <button style={styles.sendBtn} onClick={handleAskMochi}>Ask</button>
+      </div>
+
       {showAdmin && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-md z-50 flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl p-8">
+        <div style={styles.modal}>
+          <div style={styles.modalContent}>
             {!isUnlocked ? (
-              <div className="text-center">
-                <h2 className="text-xl font-bold mb-6">Mochi Control Center</h2>
+              <>
+                <h2>Admin Unlock</h2>
                 <input 
-                  type="password"
-                  className="w-full border-2 border-slate-100 rounded-xl p-4 text-center mb-4 focus:border-orange-500 outline-none"
-                  placeholder="Enter Passkey"
+                  type="password" 
+                  style={{...styles.input, width: '100%', margin: '20px 0', textAlign: 'center'}} 
+                  placeholder="Passkey"
                   onChange={(e) => setPassInput(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleAdminAuth()}
                 />
-                <button onClick={handleAdminAuth} className="w-full py-4 bg-slate-800 text-white rounded-xl font-bold">Unlock</button>
-                <button onClick={() => setShowAdmin(false)} className="mt-4 text-slate-400 text-sm">Cancel</button>
-              </div>
+                <button style={{...styles.sendBtn, width: '100%', padding: '15px'}} onClick={handleAdminAuth}>Enter</button>
+                <button style={{marginTop: '15px', border: 'none', background: 'none', color: '#94a3b8'}} onClick={() => setShowAdmin(false)}>Cancel</button>
+              </>
             ) : (
-              <div>
-                <h2 className="text-xl font-bold mb-4">Update Knowledge Base</h2>
+              <>
+                <h2>Knowledge Base</h2>
                 <textarea 
-                  className="w-full h-64 border-2 border-slate-100 rounded-2xl p-4 focus:border-orange-500 outline-none mb-6 text-sm"
-                  placeholder="Paste your crypto project details here..."
-                  value={knowledge}
+                  style={styles.textarea} 
+                  value={knowledge} 
                   onChange={(e) => setKnowledge(e.target.value)}
+                  placeholder="Paste whitepaper here..."
                 />
-                <div className="flex gap-4">
-                  <button onClick={() => setIsUnlocked(false)} className="flex-1 py-4 bg-slate-100 rounded-xl font-bold">Back</button>
-                  <button onClick={saveSettings} className="flex-1 py-4 bg-orange-500 text-white rounded-xl font-bold hover:bg-orange-600">Sync & Save</button>
-                </div>
-              </div>
+                <button style={{...styles.sendBtn, width: '100%', padding: '15px', marginTop: '20px'}} onClick={saveSettings}>Sync Mochi</button>
+              </>
             )}
           </div>
         </div>
