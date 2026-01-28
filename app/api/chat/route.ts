@@ -20,7 +20,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ text: "I can't access my knowledge base right now. Please check the Admin settings." });
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
     
     // 2. Clearer Prompting
     const prompt = `
