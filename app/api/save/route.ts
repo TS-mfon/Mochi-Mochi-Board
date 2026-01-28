@@ -7,28 +7,18 @@ export async function POST(req: Request) {
   try {
     const { password, knowledge } = await req.json();
 
-    // 1. Password Check
     if (password !== "daveeee") {
-      return NextResponse.json({ error: "Unauthorized: Incorrect Password" }, { status: 401 });
+      return NextResponse.json({ error: "Invalid Password" }, { status: 401 });
     }
 
-    // 2. The "Upsert" Logic
-    // This tells Supabase: "If ID 1 exists, update it. If not, create it."
+    // This command finds row 1 and updates it, or creates it if missing
     const { error } = await supabase
       .from('mochi_settings')
-      .upsert({ 
-        id: 1, 
-        knowledge: knowledge, 
-        updated_at: new Date().toISOString() 
-      }, { onConflict: 'id' });
+      .upsert({ id: 1, knowledge, updated_at: new Date() });
 
-    if (error) {
-      console.error("Supabase Save Error:", error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
     return NextResponse.json({ success: true });
   } catch (err) {
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json({ error: "Server Error" }, { status: 500 });
   }
 }
