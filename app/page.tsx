@@ -10,6 +10,7 @@ export default function MochiBoard() {
   const [chat, setChat] = useState<{ role: 'user' | 'ai', text: string }[]>([]);
   const [loading, setLoading] = useState(false);
 
+  // Still use useEffect to load initial state or clear local if necessary
   useEffect(() => {
     const saved = localStorage.getItem("mochi_knowledge_base");
     if (saved) setKnowledge(saved);
@@ -20,12 +21,39 @@ export default function MochiBoard() {
     else alert("Invalid access code.");
   };
 
-  const saveSettings = () => {
-    localStorage.setItem("mochi_knowledge_base", knowledge);
-    alert("Knowledge Base Updated! 🍡");
-    setShowAdmin(false);
-    setIsUnlocked(false);
-    setPassInput("");
+  // --- FIXED SAVE LOGIC (FIX 2) ---
+  const saveSettings = async () => {
+    if (!knowledge.trim()) return alert("Knowledge cannot be empty!");
+    
+    setLoading(true); // Re-use loading state for save feedback
+    try {
+      const response = await fetch('/api/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          password: passInput, 
+          knowledge: knowledge 
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Also update local storage so it stays in the text area for this session
+        localStorage.setItem("mochi_knowledge_base", knowledge);
+        alert("Mochi Board updated successfully! 🍡");
+        setIsUnlocked(false);
+        setShowAdmin(false);
+        setPassInput("");
+      } else {
+        alert("Error: " + (data.error || "Failed to update database."));
+      }
+    } catch (error) {
+      console.error("Fetch Error:", error);
+      alert("Network error. Check your Vercel logs and API paths.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleAskMochi = async () => {
@@ -39,7 +67,7 @@ export default function MochiBoard() {
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userInput, knowledge }),
+        body: JSON.stringify({ userInput }), // Backend pulls knowledge from DB now
       });
       const data = await response.json();
       setChat([...newChat, { role: 'ai', text: data.text }]);
@@ -67,7 +95,6 @@ export default function MochiBoard() {
     userBubble: { alignSelf: 'flex-end', backgroundColor: 'rgba(255, 255, 255, 0.3)', padding: '14px 22px', borderRadius: '22px 22px 4px 22px', maxWidth: '75%', fontSize: '15px' },
     aiBubble: { alignSelf: 'flex-start', backgroundColor: '#ffffff', padding: '14px 22px', borderRadius: '22px 22px 22px 4px', maxWidth: '75%', fontSize: '15px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' },
     
-    // --- FIXED ALIGNMENT SECTION ---
     inputWrapper: { 
       width: '100%', 
       maxWidth: '750px', 
@@ -76,7 +103,7 @@ export default function MochiBoard() {
       alignItems: 'center',
       backgroundColor: '#ffffff',
       borderRadius: '100px',
-      padding: '8px 12px 8px 30px', // Extra left padding for text
+      padding: '8px 12px 8px 30px', 
       boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
     },
     inputField: { 
@@ -89,7 +116,7 @@ export default function MochiBoard() {
       padding: '12px 0',
     },
     sendButton: { 
-      backgroundColor: '#8b5cf6', // Violet color from your image
+      backgroundColor: '#8b5cf6', 
       color: 'white',
       width: '52px',
       height: '52px',
@@ -102,8 +129,6 @@ export default function MochiBoard() {
       marginLeft: '10px',
       transition: 'transform 0.2s',
     },
-    // -------------------------------
-    
     footer: { marginTop: '20px', fontSize: '12px', fontWeight: '700', opacity: 0.7, letterSpacing: '1px' }
   };
 
@@ -128,7 +153,6 @@ export default function MochiBoard() {
         {loading && <div style={{ color: '#8b5cf6', fontSize: '12px', fontWeight: 'bold', marginLeft: '20px' }}>Thinking...</div>}
       </div>
 
-      {/* Corrected Input Layout */}
       <div style={styles.inputWrapper}>
         <input 
           style={styles.inputField} 
@@ -147,24 +171,39 @@ export default function MochiBoard() {
 
       <p style={styles.footer}>POWERED BY GENLAYER AI</p>
 
-      {/* Admin Panel */}
       {showAdmin && (
         <div style={{ position: 'fixed' as const, inset: 0, backgroundColor: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
           <div style={{ backgroundColor: 'white', padding: '40px', borderRadius: '30px', width: '90%', maxWidth: '500px' }}>
             {!isUnlocked ? (
               <div style={{ textAlign: 'center' }}>
                 <h2 style={{ marginBottom: '20px' }}>Admin Login</h2>
-                <input type="password" style={{ width: '100%', padding: '15px', borderRadius: '12px', border: '1px solid #ddd', marginBottom: '20px', textAlign: 'center' }} placeholder="Passkey" onChange={(e) => setPassInput(e.target.value)} />
+                <input 
+                  type="password" 
+                  style={{ width: '100%', padding: '15px', borderRadius: '12px', border: '1px solid #ddd', marginBottom: '20px', textAlign: 'center' }} 
+                  placeholder="Passkey" 
+                  value={passInput}
+                  onChange={(e) => setPassInput(e.target.value)} 
+                />
                 <button onClick={handleAdminAuth} style={{ width: '100%', padding: '15px', borderRadius: '12px', border: 'none', backgroundColor: '#0f172a', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}>Unlock</button>
               </div>
             ) : (
               <div>
                 <h2 style={{ marginBottom: '10px' }}>Knowledge Engine</h2>
-                <textarea style={{ width: '100%', height: '300px', padding: '20px', borderRadius: '16px', border: '1px solid #eee', marginBottom: '20px' }} value={knowledge} onChange={(e) => setKnowledge(e.target.value)} />
-                <button onClick={saveSettings} style={{ width: '100%', padding: '15px', borderRadius: '12px', border: 'none', backgroundColor: '#8b5cf6', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}>Save & Sync</button>
+                <textarea 
+                  style={{ width: '100%', height: '300px', padding: '20px', borderRadius: '16px', border: '1px solid #eee', marginBottom: '20px' }} 
+                  value={knowledge} 
+                  onChange={(e) => setKnowledge(e.target.value)} 
+                />
+                <button 
+                  onClick={saveSettings} 
+                  disabled={loading}
+                  style={{ width: '100%', padding: '15px', borderRadius: '12px', border: 'none', backgroundColor: '#8b5cf6', color: 'white', fontWeight: 'bold', cursor: 'pointer', opacity: loading ? 0.7 : 1 }}
+                >
+                  {loading ? "Syncing..." : "Save & Sync"}
+                </button>
               </div>
             )}
-            <button onClick={() => setShowAdmin(false)} style={{ display: 'block', margin: '20px auto 0', color: '#94a3b8', border: 'none', background: 'none', cursor: 'pointer' }}>Close</button>
+            <button onClick={() => { setShowAdmin(false); setIsUnlocked(false); }} style={{ display: 'block', margin: '20px auto 0', color: '#94a3b8', border: 'none', background: 'none', cursor: 'pointer' }}>Close</button>
           </div>
         </div>
       )}
