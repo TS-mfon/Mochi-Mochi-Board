@@ -8,17 +8,23 @@ export async function POST(req: Request) {
     const { password, knowledge } = await req.json();
 
     if (password !== "daveeee") {
-      return NextResponse.json({ error: "Invalid Password" }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // This command finds row 1 and updates it, or creates it if missing
+    // Use .upsert with a specific ID to overwrite row 1
     const { error } = await supabase
       .from('mochi_settings')
-      .upsert({ id: 1, knowledge, updated_at: new Date() });
+      .upsert({ 
+        id: 1, 
+        knowledge: knowledge, 
+        updated_at: new Date().toISOString() 
+      });
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error) throw error;
+
     return NextResponse.json({ success: true });
-  } catch (err) {
-    return NextResponse.json({ error: "Server Error" }, { status: 500 });
+  } catch (err: any) {
+    console.error("Save Error:", err.message);
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
