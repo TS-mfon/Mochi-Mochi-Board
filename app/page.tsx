@@ -52,81 +52,134 @@ export default function MochiBoard() {
     }
   };
 
-  // --- Inline Styles ---
+  // --- GenLayer Inspired Inline Styles ---
   const styles = {
-    container: { minHeight: '100 screen', backgroundColor: '#fafaf9', padding: '20px', fontFamily: 'sans-serif' },
-    nav: { maxWidth: '800px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '20px', borderBottom: '1px solid #fed7aa' },
-    logo: { fontSize: '24px', fontWeight: 'bold', color: '#ea580c' },
-    adminBtn: { fontSize: '12px', color: '#94a3b8', border: 'none', background: 'none', cursor: 'pointer', textTransform: 'uppercase' as const },
-    chatBox: { maxWidth: '800px', margin: '40px auto', height: '60vh', overflowY: 'auto' as const, display: 'flex', flexDirection: 'column' as const, gap: '15px' },
-    userMsg: { alignSelf: 'flex-end', backgroundColor: '#ea580c', color: 'white', padding: '12px 18px', borderRadius: '20px 20px 0 20px', maxWidth: '80%', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' },
-    aiMsg: { alignSelf: 'flex-start', backgroundColor: 'white', border: '1px solid #fed7aa', padding: '12px 18px', borderRadius: '20px 20px 20px 0', maxWidth: '80%', color: '#475569' },
-    inputArea: { maxWidth: '800px', margin: '0 auto', display: 'flex', gap: '10px', position: 'relative' as const },
-    input: { flex: 1, padding: '16px 24px', borderRadius: '15px', border: '1px solid #fed7aa', outline: 'none', fontSize: '16px', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' },
-    sendBtn: { backgroundColor: '#ea580c', color: 'white', border: 'none', padding: '0 25px', borderRadius: '15px', fontWeight: 'bold', cursor: 'pointer' },
-    modal: { position: 'fixed' as const, inset: 0, backgroundColor: 'rgba(15, 23, 42, 0.7)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 },
-    modalContent: { backgroundColor: 'white', padding: '40px', borderRadius: '30px', width: '90%', maxWidth: '500px', textAlign: 'center' as const },
-    textarea: { width: '100%', height: '200px', marginTop: '20px', padding: '15px', borderRadius: '10px', border: '1px solid #cbd5e1', outline: 'none' }
+    container: { 
+      minHeight: '100vh', 
+      background: 'linear-gradient(135deg, #a5f3fc 0%, #c4b5fd 50%, #93c5fd 100%)', 
+      display: 'flex', 
+      flexDirection: 'column' as const,
+      alignItems: 'center',
+      padding: '40px 20px',
+      fontFamily: '"Inter", sans-serif',
+      position: 'relative' as const,
+      color: '#1e293b'
+    },
+    header: { width: '100%', maxWidth: '900px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' },
+    logoArea: { display: 'flex', alignItems: 'center', gap: '15px', fontSize: '32px', fontWeight: '800' },
+    adminTrigger: { opacity: 0.5, cursor: 'pointer', border: 'none', background: 'none', fontSize: '12px' },
+    chatDisplay: { 
+      width: '100%', 
+      maxWidth: '800px', 
+      height: '50vh', 
+      overflowY: 'auto' as const, 
+      display: 'flex', 
+      flexDirection: 'column' as const, 
+      gap: '15px', 
+      padding: '20px',
+      marginBottom: '20px'
+    },
+    userBubble: { alignSelf: 'flex-end', backgroundColor: 'rgba(255, 255, 255, 0.2)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255, 255, 255, 0.3)', padding: '12px 20px', borderRadius: '24px', maxWidth: '75%', color: '#1e293b' },
+    aiBubble: { alignSelf: 'flex-start', backgroundColor: '#ffffff', padding: '12px 20px', borderRadius: '24px', maxWidth: '75%', boxShadow: '0 4px 15px rgba(0,0,0,0.05)' },
+    inputWrapper: { width: '100%', maxWidth: '600px', position: 'relative' as const },
+    inputField: { 
+      width: '100%', 
+      padding: '18px 60px 18px 30px', 
+      borderRadius: '50px', 
+      border: 'none', 
+      backgroundColor: '#ffffff', 
+      fontSize: '16px', 
+      boxShadow: '0 10px 25px rgba(0,0,0,0.1)', 
+      outline: 'none' 
+    },
+    sendBtn: { 
+      position: 'absolute' as const, 
+      right: '10px', 
+      top: '50%', 
+      transform: 'translateY(-50%)', 
+      background: 'none', 
+      border: 'none', 
+      cursor: 'pointer',
+      fontSize: '24px',
+      color: '#06b6d4'
+    },
+    footer: { marginTop: '30px', fontSize: '12px', fontWeight: '600', color: 'rgba(255, 255, 255, 0.8)', letterSpacing: '0.5px' },
+    modalOverlay: { position: 'fixed' as const, inset: 0, backgroundColor: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(8px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 },
+    modalContent: { backgroundColor: '#fff', padding: '40px', borderRadius: '32px', width: '90%', maxWidth: '500px', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)' }
   };
 
   return (
     <div style={styles.container}>
-      <nav style={styles.nav}>
-        <div style={styles.logo}>🍡 The Mochi Board</div>
-        <button style={styles.adminBtn} onClick={() => setShowAdmin(true)}>Manage</button>
-      </nav>
+      <header style={styles.header}>
+        <div style={styles.logoArea}>
+           <span>🍡</span> Mochi Board
+        </div>
+        <button style={styles.adminTrigger} onClick={() => setShowAdmin(true)}>⚙️ Admin</button>
+      </header>
 
-      <main style={styles.chatBox}>
+      <div style={styles.chatDisplay}>
         {chat.length === 0 && (
-          <div style={{ textAlign: 'center', marginTop: '100px', color: '#94a3b8' }}>
-            <h1 style={{ fontSize: '50px' }}>🍡</h1>
-            <p>I'm Mochi. Ask me about the project!</p>
+          <div style={{ textAlign: 'center', marginTop: '50px', opacity: 0.6 }}>
+            <p style={{ fontSize: '18px', fontWeight: '500' }}>The Mochi knowledge bank is ready.</p>
           </div>
         )}
         {chat.map((msg, i) => (
-          <div key={i} style={msg.role === 'user' ? styles.userMsg : styles.aiMsg}>
+          <div key={i} style={msg.role === 'user' ? styles.userBubble : styles.aiBubble}>
             {msg.text}
           </div>
         ))}
-        {loading && <div style={{ color: '#fb923c', fontSize: '12px', fontWeight: 'bold' }}>Mochi is thinking...</div>}
-      </main>
+        {loading && <div style={{ fontSize: '12px', color: '#fff', marginLeft: '20px' }}>Analyzing knowledge base...</div>}
+      </div>
 
-      <div style={styles.inputArea}>
+      <div style={styles.inputWrapper}>
         <input 
-          style={styles.input} 
-          placeholder="What's the tokenomics?" 
+          style={styles.inputField} 
+          placeholder="Type your message..." 
           value={userInput} 
           onChange={(e) => setUserInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleAskMochi()}
         />
-        <button style={styles.sendBtn} onClick={handleAskMochi}>Ask</button>
+        <button style={styles.sendBtn} onClick={handleAskMochi}>➔</button>
       </div>
 
+      <div style={styles.footer}>Powered by Mochi AI</div>
+
       {showAdmin && (
-        <div style={styles.modal}>
+        <div style={styles.modalOverlay}>
           <div style={styles.modalContent}>
             {!isUnlocked ? (
               <>
-                <h2>Admin Unlock</h2>
+                <h3 style={{ marginBottom: '20px' }}>Admin Access</h3>
                 <input 
                   type="password" 
-                  style={{...styles.input, width: '100%', margin: '20px 0', textAlign: 'center'}} 
+                  style={{ width: '100%', padding: '15px', borderRadius: '12px', border: '1px solid #ddd', marginBottom: '20px', textAlign: 'center' }} 
                   placeholder="Passkey"
                   onChange={(e) => setPassInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleAdminAuth()}
                 />
-                <button style={{...styles.sendBtn, width: '100%', padding: '15px'}} onClick={handleAdminAuth}>Enter</button>
-                <button style={{marginTop: '15px', border: 'none', background: 'none', color: '#94a3b8'}} onClick={() => setShowAdmin(false)}>Cancel</button>
+                <button 
+                  style={{ width: '100%', padding: '15px', borderRadius: '12px', border: 'none', backgroundColor: '#8b5cf6', color: '#fff', fontWeight: 'bold', cursor: 'pointer' }}
+                  onClick={handleAdminAuth}
+                >
+                  Unlock Board
+                </button>
+                <button onClick={() => setShowAdmin(false)} style={{ marginTop: '15px', background: 'none', border: 'none', color: '#64748b', cursor: 'pointer' }}>Close</button>
               </>
             ) : (
               <>
-                <h2>Knowledge Base</h2>
+                <h3 style={{ marginBottom: '10px' }}>Knowledge Base</h3>
+                <p style={{ fontSize: '12px', color: '#64748b', marginBottom: '15px' }}>Paste Whitepaper, FAQs, or project updates here.</p>
                 <textarea 
-                  style={styles.textarea} 
+                  style={{ width: '100%', height: '250px', padding: '15px', borderRadius: '12px', border: '1px solid #ddd', outline: 'none' }} 
                   value={knowledge} 
                   onChange={(e) => setKnowledge(e.target.value)}
-                  placeholder="Paste whitepaper here..."
                 />
-                <button style={{...styles.sendBtn, width: '100%', padding: '15px', marginTop: '20px'}} onClick={saveSettings}>Sync Mochi</button>
+                <button 
+                  style={{ width: '100%', padding: '15px', borderRadius: '12px', border: 'none', backgroundColor: '#06b6d4', color: '#fff', fontWeight: 'bold', marginTop: '20px', cursor: 'pointer' }}
+                  onClick={saveSettings}
+                >
+                  Update Mochi
+                </button>
               </>
             )}
           </div>
