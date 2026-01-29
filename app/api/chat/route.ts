@@ -9,39 +9,43 @@ export async function POST(req: Request) {
   try {
     const { userInput } = await req.json();
 
-    // 1. Fetch data and handle potential DB errors
+    // 1. Fetch the LATEST knowledge from Supabase (Row ID 1)
     const { data: settings, error: dbError } = await supabase
       .from('mochi_settings')
       .select('knowledge')
       .eq('id', 1)
       .single();
 
-    if (dbError || !settings?.knowledge) {
-      return NextResponse.json({ text: "I can't access my knowledge base right now. Please check the Admin settings." });
+    if (dbError || !settings) {
+      console.error("Database Fetch Error:", dbError);
+      return NextResponse.json({ text: "I'm having trouble accessing my knowledge bank. Please check Supabase connection." });
     }
 
+    const knowledgeBase = settings.knowledge;
+
+    // 2. Initialize Gemini with the STABLE model name
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
-    
-    // 2. Clearer Prompting
+
+    // 3. Construct the RAG Prompt
     const prompt = `
-      You are Mochi, the official crypto assistant. 
-      Use the following PROJECT DATA to answer the USER QUESTION.
-      
-      PROJECT DATA: 
-      ${settings.knowledge}
-      
-      USER QUESTION: 
+      You are Mochi, the AI expert for this project.
+      Use the provided PROJECT DATA to answer the USER QUESTION.
+      If the answer is not in the data, say you don't know yet.
+
+      PROJECT DATA:
+      ${knowledgeBase}
+
+      USER QUESTION:
       ${userInput}
-      
-      If the answer is not in the data, say you don't have that info yet.
     `;
 
     const result = await model.generateContent(prompt);
-    const text = result.response.text();
+    const response = await result.response;
+    
+    return NextResponse.json({ text: response.text() });
 
-    return NextResponse.json({ text: text || "Mochi is speechless. Try re-phrasing your question." });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Mochi Logic Error:", error);
-    return NextResponse.json({ text: "Mochi had a brain freeze. Check your Vercel logs!" });
+    return NextResponse.json({ text: "Mochi had a brain freeze. Check Vercel logs!" }, { status: 500 });
   }
 }
