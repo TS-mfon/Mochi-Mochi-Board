@@ -6,26 +6,40 @@ export default function MochiBoard() {
   const [passInput, setPassInput] = useState("");
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [knowledge, setKnowledge] = useState("");
+  const [lastUpdated, setLastUpdated] = useState<string | null>(null);
   const [userInput, setUserInput] = useState("");
   const [chat, setChat] = useState<{ role: 'user' | 'ai', text: string }[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // Still use useEffect to load initial state or clear local if necessary
+  // Fetch the current knowledge and timestamp when Admin is unlocked
   useEffect(() => {
-    const saved = localStorage.getItem("mochi_knowledge_base");
-    if (saved) setKnowledge(saved);
-  }, []);
+    if (showAdmin && isUnlocked) {
+      fetchSettings();
+    }
+  }, [showAdmin, isUnlocked]);
+
+  const fetchSettings = async () => {
+    try {
+      const response = await fetch('/api/chat'); 
+      const data = await response.json();
+      if (data.knowledge) {
+        setKnowledge(data.knowledge);
+        setLastUpdated(data.updated_at);
+      }
+    } catch (error) {
+      console.error("Failed to fetch current settings.");
+    }
+  };
 
   const handleAdminAuth = () => {
     if (passInput === "daveeee") setIsUnlocked(true);
     else alert("Invalid access code.");
   };
 
-  // --- FIXED SAVE LOGIC (FIX 2) ---
   const saveSettings = async () => {
     if (!knowledge.trim()) return alert("Knowledge cannot be empty!");
     
-    setLoading(true); // Re-use loading state for save feedback
+    setLoading(true);
     try {
       const response = await fetch('/api/save', {
         method: 'POST',
@@ -39,9 +53,8 @@ export default function MochiBoard() {
       const data = await response.json();
 
       if (data.success) {
-        // Also update local storage so it stays in the text area for this session
-        localStorage.setItem("mochi_knowledge_base", knowledge);
         alert("Mochi Board updated successfully! 🍡");
+        setLastUpdated(new Date().toISOString());
         setIsUnlocked(false);
         setShowAdmin(false);
         setPassInput("");
@@ -49,8 +62,7 @@ export default function MochiBoard() {
         alert("Error: " + (data.error || "Failed to update database."));
       }
     } catch (error) {
-      console.error("Fetch Error:", error);
-      alert("Network error. Check your Vercel logs and API paths.");
+      alert("Network error. Check your API paths.");
     } finally {
       setLoading(false);
     }
@@ -67,7 +79,7 @@ export default function MochiBoard() {
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userInput }), // Backend pulls knowledge from DB now
+        body: JSON.stringify({ userInput }), 
       });
       const data = await response.json();
       setChat([...newChat, { role: 'ai', text: data.text }]);
@@ -94,40 +106,14 @@ export default function MochiBoard() {
     },
     userBubble: { alignSelf: 'flex-end', backgroundColor: 'rgba(255, 255, 255, 0.3)', padding: '14px 22px', borderRadius: '22px 22px 4px 22px', maxWidth: '75%', fontSize: '15px' },
     aiBubble: { alignSelf: 'flex-start', backgroundColor: '#ffffff', padding: '14px 22px', borderRadius: '22px 22px 22px 4px', maxWidth: '75%', fontSize: '15px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' },
-    
     inputWrapper: { 
-      width: '100%', 
-      maxWidth: '750px', 
-      marginTop: '40px',
-      display: 'flex',
-      alignItems: 'center',
-      backgroundColor: '#ffffff',
-      borderRadius: '100px',
-      padding: '8px 12px 8px 30px', 
-      boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
+      width: '100%', maxWidth: '750px', marginTop: '40px', display: 'flex', alignItems: 'center',
+      backgroundColor: '#ffffff', borderRadius: '100px', padding: '8px 12px 8px 30px', boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
     },
-    inputField: { 
-      flex: 1,
-      border: 'none',
-      background: 'transparent',
-      fontSize: '16px',
-      outline: 'none',
-      color: '#475569',
-      padding: '12px 0',
-    },
+    inputField: { flex: 1, border: 'none', background: 'transparent', fontSize: '16px', outline: 'none', color: '#475569', padding: '12px 0' },
     sendButton: { 
-      backgroundColor: '#8b5cf6', 
-      color: 'white',
-      width: '52px',
-      height: '52px',
-      borderRadius: '50%',
-      border: 'none',
-      cursor: 'pointer',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginLeft: '10px',
-      transition: 'transform 0.2s',
+      backgroundColor: '#8b5cf6', color: 'white', width: '52px', height: '52px', borderRadius: '50%',
+      border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: '10px'
     },
     footer: { marginTop: '20px', fontSize: '12px', fontWeight: '700', opacity: 0.7, letterSpacing: '1px' }
   };
@@ -188,17 +174,20 @@ export default function MochiBoard() {
               </div>
             ) : (
               <div>
-                <h2 style={{ marginBottom: '10px' }}>Knowledge Engine</h2>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '10px' }}>
+                  <h2 style={{ margin: 0 }}>Knowledge Engine</h2>
+                  {lastUpdated && (
+                    <span style={{ fontSize: '10px', color: '#94a3b8', fontWeight: 'bold' }}>
+                      LAST SYNC: {new Date(lastUpdated).toLocaleTimeString()}
+                    </span>
+                  )}
+                </div>
                 <textarea 
                   style={{ width: '100%', height: '300px', padding: '20px', borderRadius: '16px', border: '1px solid #eee', marginBottom: '20px' }} 
                   value={knowledge} 
                   onChange={(e) => setKnowledge(e.target.value)} 
                 />
-                <button 
-                  onClick={saveSettings} 
-                  disabled={loading}
-                  style={{ width: '100%', padding: '15px', borderRadius: '12px', border: 'none', backgroundColor: '#8b5cf6', color: 'white', fontWeight: 'bold', cursor: 'pointer', opacity: loading ? 0.7 : 1 }}
-                >
+                <button onClick={saveSettings} style={{ width: '100%', padding: '15px', borderRadius: '12px', border: 'none', backgroundColor: '#8b5cf6', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}>
                   {loading ? "Syncing..." : "Save & Sync"}
                 </button>
               </div>
