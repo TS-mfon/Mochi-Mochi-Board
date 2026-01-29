@@ -54,7 +54,7 @@ export default function MochiBoard() {
       const data = await response.json();
 
       if (data.success) {
-        alert("Mochi Board updated successfully! 🍡");
+        alert("Mochi Board updated successfully! ");
         setLastUpdated(new Date().toISOString());
         setIsUnlocked(false);
         setShowAdmin(false);
@@ -133,14 +133,14 @@ export default function MochiBoard() {
   return (
     <div style={styles.container}>
       <header style={styles.header}>
-        <div style={styles.logo}>🍡 MOCHI BOARD</div>
+        <div style={styles.logo}> MOCHI BOARD</div>
         <button onClick={() => setShowAdmin(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', opacity: 0.5 }}>⚙️</button>
       </header>
 
       <div style={styles.chatPanel}>
         {chat.length === 0 && (
           <div style={{ textAlign: 'center', margin: 'auto', opacity: 0.5 }}>
-            <p>Ready to help with your crypto project details.</p>
+            <p>Ready to help answer your Genlayer Questions.</p>
           </div>
         )}
         {chat.map((msg, i) => (
