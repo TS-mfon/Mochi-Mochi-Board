@@ -25,7 +25,7 @@ export async function POST(req: Request) {
     // 2. Initialize Gemini with the standard model string
     // By default, the latest SDK versions will handle this correctly if the Key is valid
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-flash",
+      model: "gemini-2.5-flash",
     });
 
     // 3. Construct the RAG Prompt
