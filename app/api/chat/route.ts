@@ -9,7 +9,7 @@ export async function POST(req: Request) {
   try {
     const { userInput } = await req.json();
 
-    // 1. Fetch the LATEST knowledge from Supabase (Row ID 1)
+    // 1. Fetch data from Supabase Row 1
     const { data: settings, error: dbError } = await supabase
       .from('mochi_settings')
       .select('knowledge')
@@ -17,47 +17,34 @@ export async function POST(req: Request) {
       .single();
 
     if (dbError || !settings) {
-      console.error("Database Fetch Error:", dbError);
-      return NextResponse.json({ text: "I'm having trouble accessing my knowledge bank. Please check Supabase connection." });
+      return NextResponse.json({ text: "Database fetch failed. Check your Supabase table!" });
     }
 
-    const knowledgeBase = settings.knowledge;
+    // 2. Initialize the AI with the CORRECT model string
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    // 2. Initialize Gemini with the STABLE model name
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
-
-    // 3. Construct the RAG Prompt
+    // 3. The RAG Prompt
     const prompt = `
-      You are Mochi, the AI expert for this project.
-      Use the provided PROJECT DATA to answer the USER QUESTION.
-      If the answer is not in the data, say you don't know yet.
-
-      PROJECT DATA:
-      ${knowledgeBase}
-
-      USER QUESTION:
-      ${userInput}
+      Context: ${settings.knowledge}
+      Question: ${userInput}
+      Instruction: Answer only using the context above.
     `;
 
     const result = await model.generateContent(prompt);
-    const response = await result.response;
-    
-    return NextResponse.json({ text: response.text() });
+    return NextResponse.json({ text: result.response.text() });
 
-  } catch (error: any) {
+  } catch (error) {
     console.error("Mochi Logic Error:", error);
-    return NextResponse.json({ text: "Mochi had a brain freeze. Check Vercel logs!" }, { status: 500 });
+    return NextResponse.json({ text: "AI connection error. Check Vercel logs!" }, { status: 500 });
   }
 }
 
-
+// Keep the GET method for your "Last Updated" feature
 export async function GET() {
-  const { data: settings, error } = await supabase
+  const { data: settings } = await supabase
     .from('mochi_settings')
     .select('knowledge, updated_at')
     .eq('id', 1)
     .single();
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json(settings);
 }
