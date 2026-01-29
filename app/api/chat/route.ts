@@ -17,21 +17,21 @@ export async function POST(req: Request) {
       .single();
 
     if (dbError || !settings) {
-      return NextResponse.json({ text: "Mochi couldn't find the knowledge base in the database." });
+      return NextResponse.json({ text: "Database Error: Please ensure row 1 exists in Supabase." });
     }
 
-    // 2. Initialize Gemini with the FULL resource path
-    const model = genAI.getGenerativeModel({ model: "models/gemini-1.5-flash" });
+    // 2. Initialize Gemini with a version-locked string
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-001" });
 
-    // 3. Construct the RAG (Retrieval-Augmented Generation) Prompt
+    // 3. Construct the RAG Prompt
     const prompt = `
-      CONTEXT FROM KNOWLEDGE BASE:
+      KNOWLEDGE BASE:
       ${settings.knowledge}
 
-      USER QUESTION:
+      QUESTION:
       ${userInput}
 
-      INSTRUCTION: Answer the question using ONLY the context provided above.
+      INSTRUCTION: Answer strictly using the KNOWLEDGE BASE provided above.
     `;
 
     const result = await model.generateContent(prompt);
@@ -39,9 +39,9 @@ export async function POST(req: Request) {
     
     return NextResponse.json({ text: response.text() });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error("Mochi Logic Error:", error);
-    return NextResponse.json({ text: "AI Request Failed. Verify your API Key in Vercel." }, { status: 500 });
+    return NextResponse.json({ text: `Mochi Error: ${error.message}` }, { status: 500 });
   }
 }
 
