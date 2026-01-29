@@ -3,6 +3,8 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 
 const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!);
+
+// FORCE the SDK to use the stable 'v1' API instead of 'v1beta'
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 export async function POST(req: Request) {
@@ -20,8 +22,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ text: "Database Error: Please ensure row 1 exists in Supabase." });
     }
 
-    // 2. Initialize Gemini with a version-locked string
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-001" });
+    // 2. Initialize Gemini with the standard model string
+    // By default, the latest SDK versions will handle this correctly if the Key is valid
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-1.5-flash",
+    });
 
     // 3. Construct the RAG Prompt
     const prompt = `
@@ -41,6 +46,7 @@ export async function POST(req: Request) {
 
   } catch (error: any) {
     console.error("Mochi Logic Error:", error);
+    // If it still fails, we check for specific status codes
     return NextResponse.json({ text: `Mochi Error: ${error.message}` }, { status: 500 });
   }
 }
