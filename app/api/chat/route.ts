@@ -30,15 +30,21 @@ export async function POST(req: Request) {
 
     // 3. Construct the RAG Prompt
     const prompt = `
-      KNOWLEDGE BASE:
-      ${settings.knowledge}
+    You are Mochi, a professional Web3 Technical Assistant.
+    Use the KNOWLEDGE BASE below to answer the QUESTION.
 
-      QUESTION:
-      ${userInput}
+    FORMATTING INSTRUCTIONS:
+    - Use ### for Section Headers.
+    - Use bullet points for lists of features or facts.
+    - Use **bold** for important terms.
+    - Break up long paragraphs into small, readable chunks.
 
-      INSTRUCTION: Answer strictly using the KNOWLEDGE BASE provided above.
-    `;
+    KNOWLEDGE BASE:
+    ${settings.knowledge}
 
+    QUESTION:
+    ${userInput}
+`;
     const result = await model.generateContent(prompt);
     const response = await result.response;
     
