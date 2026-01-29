@@ -1,4 +1,5 @@
 "use client";
+import ReactMarkdown from 'react-markdown';
 import React, { useState, useEffect } from 'react';
 
 export default function MochiBoard() {
