@@ -133,7 +133,15 @@ export default function MochiBoard() {
   return (
     <div style={styles.container}>
       <header style={styles.header}>
-        <div style={styles.logo}> MOCHI BOARD</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+          {/* GenLayer Logo Image */}
+          <img 
+            src="/genlayer-logo.png" 
+            alt="GenLayer Logo" 
+            style={{ height: '40px', width: 'auto', filter: 'invert(1)' }} // 'invert(1)' makes the black logo white for your dark theme
+          />
+          <div style={styles.logo}>MOCHI BOARD</div>
+        </div>
         <button onClick={() => setShowAdmin(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', opacity: 0.5 }}>⚙️</button>
       </header>
 
