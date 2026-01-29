@@ -134,7 +134,11 @@ export default function MochiBoard() {
         )}
         {chat.map((msg, i) => (
           <div key={i} style={msg.role === 'user' ? styles.userBubble : styles.aiBubble}>
-            {msg.text}
+            {msg.role === 'ai' ? (
+              <ReactMarkdown>{msg.text}</ReactMarkdown>
+            ) : (
+              msg.text
+            )}
           </div>
         ))}
         {loading && <div style={{ color: '#8b5cf6', fontSize: '12px', fontWeight: 'bold', marginLeft: '20px' }}>Thinking...</div>}
