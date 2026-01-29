@@ -94,31 +94,42 @@ export default function MochiBoard() {
   const styles = {
     container: { 
       minHeight: '100vh', 
-      background: 'linear-gradient(135deg, #a5f3fc 0%, #c4b5fd 50%, #93c5fd 100%)', 
+      background: 'radial-gradient(circle at top right, #282B5D, #000000)', // Deep Navy to Black
       display: 'flex', flexDirection: 'column' as const, alignItems: 'center', padding: '20px',
-      fontFamily: '"Inter", sans-serif', color: '#0f172a'
+      fontFamily: '"Inter", sans-serif', color: '#FFFFFF'
     },
     header: { width: '100%', maxWidth: '850px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 0' },
-    logo: { fontSize: '28px', fontWeight: '900', letterSpacing: '-1px', display: 'flex', alignItems: 'center', gap: '10px' },
+    logo: { fontSize: '28px', fontWeight: '900', letterSpacing: '-1px', color: '#E37DF7' }, // Neon Purple Logo
     chatPanel: {
       width: '100%', maxWidth: '850px', height: '55vh', marginTop: '20px', padding: '30px',
-      background: 'rgba(255, 255, 255, 0.25)', backdropFilter: 'blur(15px)', border: '1px solid rgba(255, 255, 255, 0.3)',
+      background: 'rgba(40, 43, 93, 0.4)', backdropFilter: 'blur(20px)', border: '1px solid #110FFF', // Electric Blue Border
       borderRadius: '32px', display: 'flex', flexDirection: 'column' as const, gap: '20px', overflowY: 'auto' as const,
     },
-    userBubble: { alignSelf: 'flex-end', backgroundColor: 'rgba(255, 255, 255, 0.3)', padding: '14px 22px', borderRadius: '22px 22px 4px 22px', maxWidth: '75%', fontSize: '15px' },
-    aiBubble: { alignSelf: 'flex-start', backgroundColor: '#ffffff', padding: '14px 22px', borderRadius: '22px 22px 22px 4px', maxWidth: '75%', fontSize: '15px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' },
+    userBubble: { 
+      alignSelf: 'flex-end', 
+      backgroundColor: '#110FFF', // Electric Blue for User
+      color: '#FFFFFF', padding: '14px 22px', borderRadius: '22px 22px 4px 22px', maxWidth: '75%', fontSize: '15px' 
+    },
+    aiBubble: { 
+      alignSelf: 'flex-start', 
+      backgroundColor: '#FFFFFF', // Clean White for AI
+      color: '#000000', padding: '14px 22px', borderRadius: '22px 22px 22px 4px', maxWidth: '75%', fontSize: '15px', 
+      boxShadow: '0 4px 20px rgba(227, 125, 247, 0.3)' // Neon Purple Glow
+    },
     inputWrapper: { 
       width: '100%', maxWidth: '750px', marginTop: '40px', display: 'flex', alignItems: 'center',
-      backgroundColor: '#ffffff', borderRadius: '100px', padding: '8px 12px 8px 30px', boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
+      backgroundColor: '#FFFFFF', borderRadius: '100px', padding: '8px 12px 8px 30px', 
+      boxShadow: '0 0 20px rgba(17, 15, 255, 0.4)', // Electric Blue Glow
     },
-    inputField: { flex: 1, border: 'none', background: 'transparent', fontSize: '16px', outline: 'none', color: '#475569', padding: '12px 0' },
+    inputField: { flex: 1, border: 'none', background: 'transparent', fontSize: '16px', outline: 'none', color: '#000000', padding: '12px 0' },
     sendButton: { 
-      backgroundColor: '#8b5cf6', color: 'white', width: '52px', height: '52px', borderRadius: '50%',
+      backgroundColor: '#E37DF7', // Neon Purple Send Button
+      color: '#FFFFFF', width: '52px', height: '52px', borderRadius: '50%',
       border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: '10px'
     },
-    footer: { marginTop: '20px', fontSize: '12px', fontWeight: '700', opacity: 0.7, letterSpacing: '1px' }
+    footer: { marginTop: '20px', fontSize: '12px', fontWeight: '700', opacity: 0.8, color: '#E37DF7', letterSpacing: '1px' }
   };
-
+  
   return (
     <div style={styles.container}>
       <header style={styles.header}>
