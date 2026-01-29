@@ -9,7 +9,7 @@ export async function POST(req: Request) {
   try {
     const { userInput } = await req.json();
 
-    // 1. Fetch data from Supabase Row 1
+    // 1. Fetch knowledge from Supabase
     const { data: settings, error: dbError } = await supabase
       .from('mochi_settings')
       .select('knowledge')
@@ -17,29 +17,34 @@ export async function POST(req: Request) {
       .single();
 
     if (dbError || !settings) {
-      return NextResponse.json({ text: "Database fetch failed. Check your Supabase table!" });
+      return NextResponse.json({ text: "Mochi couldn't find the knowledge base in the database." });
     }
 
-    // 2. Initialize the AI with the CORRECT model string
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    // 2. Initialize Gemini with the FULL resource path
+    const model = genAI.getGenerativeModel({ model: "models/gemini-1.5-flash" });
 
-    // 3. The RAG Prompt
+    // 3. Construct the RAG (Retrieval-Augmented Generation) Prompt
     const prompt = `
-      Context: ${settings.knowledge}
-      Question: ${userInput}
-      Instruction: Answer only using the context above.
+      CONTEXT FROM KNOWLEDGE BASE:
+      ${settings.knowledge}
+
+      USER QUESTION:
+      ${userInput}
+
+      INSTRUCTION: Answer the question using ONLY the context provided above.
     `;
 
     const result = await model.generateContent(prompt);
-    return NextResponse.json({ text: result.response.text() });
+    const response = await result.response;
+    
+    return NextResponse.json({ text: response.text() });
 
   } catch (error) {
     console.error("Mochi Logic Error:", error);
-    return NextResponse.json({ text: "AI connection error. Check Vercel logs!" }, { status: 500 });
+    return NextResponse.json({ text: "AI Request Failed. Verify your API Key in Vercel." }, { status: 500 });
   }
 }
 
-// Keep the GET method for your "Last Updated" feature
 export async function GET() {
   const { data: settings } = await supabase
     .from('mochi_settings')
