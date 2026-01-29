@@ -49,3 +49,15 @@ export async function POST(req: Request) {
     return NextResponse.json({ text: "Mochi had a brain freeze. Check Vercel logs!" }, { status: 500 });
   }
 }
+
+
+export async function GET() {
+  const { data: settings, error } = await supabase
+    .from('mochi_settings')
+    .select('knowledge, updated_at')
+    .eq('id', 1)
+    .single();
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json(settings);
+}
