@@ -12,7 +12,6 @@ export default function MochiBoard() {
   const [chat, setChat] = useState<{ role: 'user' | 'ai', text: string }[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // Fetch the current knowledge and timestamp when Admin is unlocked
   useEffect(() => {
     if (showAdmin && isUnlocked) {
       fetchSettings();
@@ -28,7 +27,7 @@ export default function MochiBoard() {
         setLastUpdated(data.updated_at);
       }
     } catch (error) {
-      console.error("Failed to fetch current settings.");
+      console.error("Failed to fetch settings.");
     }
   };
 
@@ -39,22 +38,16 @@ export default function MochiBoard() {
 
   const saveSettings = async () => {
     if (!knowledge.trim()) return alert("Knowledge cannot be empty!");
-    
     setLoading(true);
     try {
       const response = await fetch('/api/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          password: passInput, 
-          knowledge: knowledge 
-        }),
+        body: JSON.stringify({ password: passInput, knowledge: knowledge }),
       });
-
       const data = await response.json();
-
       if (data.success) {
-        alert("Mochi Board updated successfully! ");
+        alert("Mochi Board updated! 🍡");
         setLastUpdated(new Date().toISOString());
         setIsUnlocked(false);
         setShowAdmin(false);
@@ -63,7 +56,7 @@ export default function MochiBoard() {
         alert("Error: " + (data.error || "Failed to update database."));
       }
     } catch (error) {
-      alert("Network error. Check your API paths.");
+      alert("Network error.");
     } finally {
       setLoading(false);
     }
@@ -75,7 +68,6 @@ export default function MochiBoard() {
     setChat(newChat);
     setUserInput("");
     setLoading(true);
-
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
@@ -94,75 +86,68 @@ export default function MochiBoard() {
   const styles = {
     container: { 
       minHeight: '100vh', 
-      background: 'radial-gradient(circle at top right, #282B5D, #000000)', // Deep Navy to Black
+      background: 'linear-gradient(180deg, #282B5D 0%, #000000 100%)', // GenLayer Navy to Black
       display: 'flex', flexDirection: 'column' as const, alignItems: 'center', padding: '20px',
       fontFamily: '"Inter", sans-serif', color: '#FFFFFF'
     },
-    header: { width: '100%', maxWidth: '850px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 0' },
-    logo: { fontSize: '28px', fontWeight: '900', letterSpacing: '-1px', color: '#E37DF7' }, // Neon Purple Logo
+    header: { width: '100%', maxWidth: '900px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '30px 0' },
+    logoContainer: { display: 'flex', alignItems: 'center', gap: '12px' },
+    logoText: { fontSize: '22px', fontWeight: '800', letterSpacing: '2px', color: '#E37DF7', textTransform: 'uppercase' as const },
     chatPanel: {
-      width: '100%', maxWidth: '850px', height: '55vh', marginTop: '20px', padding: '30px',
-      background: 'rgba(40, 43, 93, 0.4)', backdropFilter: 'blur(20px)', border: '1px solid #110FFF', // Electric Blue Border
-      borderRadius: '32px', display: 'flex', flexDirection: 'column' as const, gap: '20px', overflowY: 'auto' as const,
+      width: '100%', maxWidth: '900px', height: '60vh', marginTop: '10px', padding: '30px',
+      background: 'rgba(40, 43, 93, 0.2)', backdropFilter: 'blur(25px)', border: '1px solid rgba(17, 15, 255, 0.3)',
+      borderRadius: '40px', display: 'flex', flexDirection: 'column' as const, gap: '20px', overflowY: 'auto' as const,
+      boxShadow: '0 20px 50px rgba(0,0,0,0.5)'
     },
     userBubble: { 
-      alignSelf: 'flex-end', 
-      backgroundColor: '#110FFF', // Electric Blue for User
-      color: '#FFFFFF', padding: '14px 22px', borderRadius: '22px 22px 4px 22px', maxWidth: '75%', fontSize: '15px' 
+      alignSelf: 'flex-end', backgroundColor: '#110FFF', color: '#FFFFFF', 
+      padding: '16px 24px', borderRadius: '25px 25px 4px 25px', maxWidth: '70%', fontSize: '15px',
+      boxShadow: '0 4px 15px rgba(17, 15, 255, 0.4)'
     },
     aiBubble: { 
-      alignSelf: 'flex-start', 
-      backgroundColor: '#FFFFFF', // Clean White for AI
-      color: '#000000', padding: '14px 22px', borderRadius: '22px 22px 22px 4px', maxWidth: '75%', fontSize: '15px', 
-      boxShadow: '0 4px 20px rgba(227, 125, 247, 0.3)' // Neon Purple Glow
+      alignSelf: 'flex-start', backgroundColor: '#FFFFFF', color: '#000000', 
+      padding: '20px 28px', borderRadius: '25px 25px 25px 4px', maxWidth: '80%', fontSize: '15px', 
+      boxShadow: '0 10px 30px rgba(227, 125, 247, 0.2)', lineHeight: '1.6'
     },
     inputWrapper: { 
-      width: '100%', maxWidth: '750px', marginTop: '40px', display: 'flex', alignItems: 'center',
-      backgroundColor: '#FFFFFF', borderRadius: '100px', padding: '8px 12px 8px 30px', 
-      boxShadow: '0 0 20px rgba(17, 15, 255, 0.4)', // Electric Blue Glow
+      width: '100%', maxWidth: '800px', marginTop: '40px', display: 'flex', alignItems: 'center',
+      backgroundColor: 'rgba(255, 255, 255, 0.05)', borderRadius: '100px', padding: '10px 15px 10px 35px', 
+      border: '1px solid rgba(255, 255, 255, 0.1)', backdropFilter: 'blur(10px)',
     },
-    inputField: { flex: 1, border: 'none', background: 'transparent', fontSize: '16px', outline: 'none', color: '#000000', padding: '12px 0' },
+    inputField: { flex: 1, border: 'none', background: 'transparent', fontSize: '16px', outline: 'none', color: '#FFFFFF', padding: '12px 0' },
     sendButton: { 
-      backgroundColor: '#E37DF7', // Neon Purple Send Button
-      color: '#FFFFFF', width: '52px', height: '52px', borderRadius: '50%',
-      border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: '10px'
+      backgroundColor: '#E37DF7', color: '#FFFFFF', width: '56px', height: '56px', borderRadius: '50%',
+      border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: '10px',
+      boxShadow: '0 0 20px rgba(227, 125, 247, 0.5)', transition: 'all 0.3s ease'
     },
-    footer: { marginTop: '20px', fontSize: '12px', fontWeight: '700', opacity: 0.8, color: '#E37DF7', letterSpacing: '1px' }
+    footer: { marginTop: '30px', fontSize: '11px', fontWeight: '800', color: '#E37DF7', letterSpacing: '3px', textTransform: 'uppercase' as const, opacity: 0.7 }
   };
-  
+
   return (
     <div style={styles.container}>
       <header style={styles.header}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-          {/* GenLayer Logo Image */}
-          <img 
-            src="/genlayer-logo.png" 
-            alt="GenLayer Logo" 
-            style={{ height: '40px', width: 'auto', filter: 'invert(1)' }} // 'invert(1)' makes the black logo white for your dark theme
-          />
-          <div style={styles.logo}>MOCHI BOARD</div>
+        <div style={styles.logoContainer}>
+          <img src="/genlayer-logo.png" alt="Logo" style={{ height: '32px', width: 'auto', filter: 'invert(1)' }} />
+          <div style={styles.logoText}>Mochi Board</div>
         </div>
-        <button onClick={() => setShowAdmin(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', opacity: 0.5 }}>⚙️</button>
+        <button onClick={() => setShowAdmin(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', opacity: 0.4 }}>⚙️</button>
       </header>
 
       <div style={styles.chatPanel}>
         {chat.length === 0 && (
-          <div style={{ textAlign: 'center', margin: 'auto', opacity: 0.5 }}>
-            <p>Ready to help answer your Genlayer Questions.</p>
+          <div style={{ textAlign: 'center', margin: 'auto' }}>
+            <p style={{ color: '#E37DF7', fontWeight: '700', letterSpacing: '1px' }}>Ready to help with answers relating to GenLayer.</p>
+            <p style={{ fontSize: '12px', opacity: 0.4, marginTop: '10px' }}>Ask about Intelligent Contracts, Consensus, or the Ecosystem.</p>
           </div>
         )}
         {chat.map((msg, i) => (
           <div key={i} style={msg.role === 'user' ? styles.userBubble : styles.aiBubble}>
-            {msg.role === 'ai' ? (
-              <ReactMarkdown>{msg.text}</ReactMarkdown>
-            ) : (
-              msg.text
-            )}
+            {msg.role === 'ai' ? <ReactMarkdown>{msg.text}</ReactMarkdown> : msg.text}
           </div>
         ))}
         {loading && (
-          <div style={{ color: '#E37DF7', fontSize: '12px', fontWeight: 'bold', marginLeft: '20px', letterSpacing: '1px' }}>
-            Mochi is cooking...
+          <div style={{ color: '#E37DF7', fontSize: '11px', fontWeight: '900', marginLeft: '25px', letterSpacing: '2px' }}>
+            MOCHI IS COOKING...
           </div>
         )}
       </div>
@@ -170,13 +155,13 @@ export default function MochiBoard() {
       <div style={styles.inputWrapper}>
         <input 
           style={styles.inputField} 
-          placeholder="Ask anything about the project..." 
+          placeholder="Ask Mochi anything about GenLayer..." 
           value={userInput} 
           onChange={(e) => setUserInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleAskMochi()}
         />
         <button style={styles.sendButton} onClick={handleAskMochi}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
             <line x1="22" y1="2" x2="11" y2="13"></line>
             <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
           </svg>
@@ -185,42 +170,39 @@ export default function MochiBoard() {
 
       <p style={styles.footer}>Made By Gen. Dave</p>
 
+      {/* Admin Panel */}
       {showAdmin && (
-        <div style={{ position: 'fixed' as const, inset: 0, backgroundColor: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-          <div style={{ backgroundColor: 'white', padding: '40px', borderRadius: '30px', width: '90%', maxWidth: '500px' }}>
+        <div style={{ position: 'fixed' as const, inset: 0, backgroundColor: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(20px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div style={{ backgroundColor: '#1e293b', padding: '40px', borderRadius: '40px', width: '90%', maxWidth: '550px', border: '1px solid #E37DF7' }}>
             {!isUnlocked ? (
               <div style={{ textAlign: 'center' }}>
-                <h2 style={{ marginBottom: '20px' }}>Admin Login</h2>
+                <h2 style={{ color: '#E37DF7', marginBottom: '25px' }}>Terminal Access</h2>
                 <input 
                   type="password" 
-                  style={{ width: '100%', padding: '15px', borderRadius: '12px', border: '1px solid #ddd', marginBottom: '20px', textAlign: 'center' }} 
-                  placeholder="Passkey" 
+                  style={{ width: '100%', padding: '18px', borderRadius: '15px', border: 'none', backgroundColor: '#0f172a', color: 'white', marginBottom: '20px', textAlign: 'center' }} 
+                  placeholder="Enter Passkey" 
                   value={passInput}
                   onChange={(e) => setPassInput(e.target.value)} 
                 />
-                <button onClick={handleAdminAuth} style={{ width: '100%', padding: '15px', borderRadius: '12px', border: 'none', backgroundColor: '#0f172a', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}>Unlock</button>
+                <button onClick={handleAdminAuth} style={{ width: '100%', padding: '18px', borderRadius: '15px', border: 'none', backgroundColor: '#E37DF7', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}>Unlock Base</button>
               </div>
             ) : (
               <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '10px' }}>
-                  <h2 style={{ margin: 0 }}>Knowledge Engine</h2>
-                  {lastUpdated && (
-                    <span style={{ fontSize: '10px', color: '#94a3b8', fontWeight: 'bold' }}>
-                      LAST SYNC: {new Date(lastUpdated).toLocaleTimeString()}
-                    </span>
-                  )}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                  <h3 style={{ margin: 0, color: '#E37DF7' }}>Knowledge Core</h3>
+                  {lastUpdated && <span style={{ fontSize: '10px', color: '#94a3b8' }}>SYNC: {new Date(lastUpdated).toLocaleTimeString()}</span>}
                 </div>
                 <textarea 
-                  style={{ width: '100%', height: '300px', padding: '20px', borderRadius: '16px', border: '1px solid #eee', marginBottom: '20px' }} 
+                  style={{ width: '100%', height: '300px', padding: '20px', borderRadius: '20px', border: 'none', backgroundColor: '#0f172a', color: '#e2e8f0', marginBottom: '20px', fontSize: '14px' }} 
                   value={knowledge} 
                   onChange={(e) => setKnowledge(e.target.value)} 
                 />
-                <button onClick={saveSettings} style={{ width: '100%', padding: '15px', borderRadius: '12px', border: 'none', backgroundColor: '#8b5cf6', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}>
-                  {loading ? "Syncing..." : "Save & Sync"}
+                <button onClick={saveSettings} style={{ width: '100%', padding: '18px', borderRadius: '15px', border: 'none', backgroundColor: '#110FFF', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}>
+                  {loading ? "INITIALIZING SYNC..." : "PUSH TO MAINNET"}
                 </button>
               </div>
             )}
-            <button onClick={() => { setShowAdmin(false); setIsUnlocked(false); }} style={{ display: 'block', margin: '20px auto 0', color: '#94a3b8', border: 'none', background: 'none', cursor: 'pointer' }}>Close</button>
+            <button onClick={() => { setShowAdmin(false); setIsUnlocked(false); }} style={{ display: 'block', margin: '25px auto 0', color: '#64748b', border: 'none', background: 'none', cursor: 'pointer' }}>Disconnect</button>
           </div>
         </div>
       )}
