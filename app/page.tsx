@@ -1,5 +1,4 @@
 "use client";
-import Image from 'next/image';
 import ReactMarkdown from 'react-markdown';
 import React, { useState, useEffect } from 'react';
 
@@ -48,7 +47,7 @@ export default function MochiBoard() {
       });
       const data = await response.json();
       if (data.success) {
-        alert("Mochi Board updated! 🍡");
+        alert("Mochi Board updated successfully!");
         setLastUpdated(new Date().toISOString());
         setIsUnlocked(false);
         setShowAdmin(false);
@@ -87,31 +86,31 @@ export default function MochiBoard() {
   const styles = {
     container: { 
       minHeight: '100vh', 
-      background: 'linear-gradient(180deg, #282B5D 0%, #000000 100%)', // GenLayer Navy to Black
-      display: 'flex', flexDirection: 'column' as const, alignItems: 'center', padding: '20px',
-      fontFamily: '"Inter", sans-serif', color: '#FFFFFF'
+      background: 'linear-gradient(180deg, #282B5D 0%, #000000 100%)', // GenLayer Navy to Black [cite: 242, 243]
+      display: 'flex', flexDirection: 'column' as const, alignItems: 'center',
+      fontFamily: '"Inter", sans-serif', color: '#FFFFFF',
+      width: '100%',
     },
-    header: { width: '100%', maxWidth: '900px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '30px 0' },
-    logoContainer: { display: 'flex', alignItems: 'center', gap: '12px' },
-    logoText: { fontSize: '22px', fontWeight: '800', letterSpacing: '2px', color: '#E37DF7', textTransform: 'uppercase' as const },
+    header: { width: '100%', maxWidth: '900px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '30px 20px' },
+    logoText: { fontSize: '22px', fontWeight: '800', letterSpacing: '2px', color: '#E37DF7', textTransform: 'uppercase' as const }, // Neon Purple Accent [cite: 120, 233]
     chatPanel: {
-      width: '100%', maxWidth: '900px', height: '60vh', marginTop: '10px', padding: '30px',
-      background: 'rgba(40, 43, 93, 0.2)', backdropFilter: 'blur(25px)', border: '1px solid rgba(17, 15, 255, 0.3)',
+      width: 'calc(100% - 40px)', maxWidth: '900px', height: '60vh', marginTop: '10px', padding: '30px',
+      background: 'rgba(40, 43, 93, 0.2)', backdropFilter: 'blur(25px)', border: '1px solid rgba(17, 15, 255, 0.3)', // Primary Blue Border [cite: 241]
       borderRadius: '40px', display: 'flex', flexDirection: 'column' as const, gap: '20px', overflowY: 'auto' as const,
       boxShadow: '0 20px 50px rgba(0,0,0,0.5)'
     },
     userBubble: { 
-      alignSelf: 'flex-end', backgroundColor: '#110FFF', color: '#FFFFFF', 
+      alignSelf: 'flex-end', backgroundColor: '#110FFF', color: '#FFFFFF', // Electric Blue [cite: 241]
       padding: '16px 24px', borderRadius: '25px 25px 4px 25px', maxWidth: '70%', fontSize: '15px',
       boxShadow: '0 4px 15px rgba(17, 15, 255, 0.4)'
     },
     aiBubble: { 
-      alignSelf: 'flex-start', backgroundColor: '#FFFFFF', color: '#000000', 
+      alignSelf: 'flex-start', backgroundColor: '#FFFFFF', color: '#000000', // White for high contrast [cite: 124, 244]
       padding: '20px 28px', borderRadius: '25px 25px 25px 4px', maxWidth: '80%', fontSize: '15px', 
       boxShadow: '0 10px 30px rgba(227, 125, 247, 0.2)', lineHeight: '1.6'
     },
     inputWrapper: { 
-      width: '100%', maxWidth: '800px', marginTop: '40px', display: 'flex', alignItems: 'center',
+      width: 'calc(100% - 40px)', maxWidth: '800px', marginTop: '40px', display: 'flex', alignItems: 'center',
       backgroundColor: 'rgba(255, 255, 255, 0.05)', borderRadius: '100px', padding: '10px 15px 10px 35px', 
       border: '1px solid rgba(255, 255, 255, 0.1)', backdropFilter: 'blur(10px)',
     },
@@ -121,18 +120,23 @@ export default function MochiBoard() {
       border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: '10px',
       boxShadow: '0 0 20px rgba(227, 125, 247, 0.5)', transition: 'all 0.3s ease'
     },
-    footer: { marginTop: '30px', fontSize: '11px', fontWeight: '800', color: '#E37DF7', letterSpacing: '3px', textTransform: 'uppercase' as const, opacity: 0.7 }
+    footer: { 
+      width: '100%', 
+      marginTop: 'auto', 
+      padding: '40px 0', 
+      textAlign: 'center' as const,
+      background: 'linear-gradient(to top, rgba(227, 125, 247, 0.1), transparent)', // Subtle purple glow [cite: 233]
+      borderTop: '1px solid rgba(227, 125, 247, 0.2)',
+      fontSize: '11px', fontWeight: '800', color: '#E37DF7', letterSpacing: '3px', textTransform: 'uppercase' as const 
+    }
   };
 
   return (
-    <header style={styles.header}>
-      <button 
-        onClick={() => setShowAdmin(true)} 
-        style={{ background: 'none', border: 'none', cursor: 'pointer', opacity: 0.4, fontSize: '20px' }}
-      >
-        ⚙️
-      </button>
-    </header>
+    <div style={styles.container}>
+      <header style={styles.header}>
+        <div style={styles.logoText}>Mochi Board</div>
+        <button onClick={() => setShowAdmin(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', opacity: 0.4 }}>⚙️</button>
+      </header>
 
       <div style={styles.chatPanel}>
         {chat.length === 0 && (
@@ -169,9 +173,10 @@ export default function MochiBoard() {
         </button>
       </div>
 
-      <p style={styles.footer}>Made By Gen. Dave</p>
+      <footer style={styles.footer}>
+        Made By Gen. Dave
+      </footer>
 
-      {/* Admin Panel */}
       {showAdmin && (
         <div style={{ position: 'fixed' as const, inset: 0, backgroundColor: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(20px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
           <div style={{ backgroundColor: '#1e293b', padding: '40px', borderRadius: '40px', width: '90%', maxWidth: '550px', border: '1px solid #E37DF7' }}>
