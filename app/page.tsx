@@ -90,6 +90,8 @@ export default function MochiBoard() {
       display: 'flex', flexDirection: 'column' as const, alignItems: 'center',
       fontFamily: '"Inter", sans-serif', color: '#FFFFFF',
       width: '100%',
+      margin: 0,
+      padding: 0,
     },
     header: { width: '100%', maxWidth: '900px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '30px 20px' },
     logoText: { fontSize: '22px', fontWeight: '800', letterSpacing: '2px', color: '#E37DF7', textTransform: 'uppercase' as const }, // Neon Purple Accent [cite: 120, 233]
