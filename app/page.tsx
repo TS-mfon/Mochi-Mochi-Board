@@ -160,7 +160,11 @@ export default function MochiBoard() {
             )}
           </div>
         ))}
-        {loading && <div style={{ color: '#8b5cf6', fontSize: '12px', fontWeight: 'bold', marginLeft: '20px' }}>Thinking...</div>}
+        {loading && (
+          <div style={{ color: '#E37DF7', fontSize: '12px', fontWeight: 'bold', marginLeft: '20px', letterSpacing: '1px' }}>
+            Mochi is cooking...
+          </div>
+        )}
       </div>
 
       <div style={styles.inputWrapper}>
