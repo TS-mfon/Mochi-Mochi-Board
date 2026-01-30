@@ -126,12 +126,6 @@ export default function MochiBoard() {
 
   return (
     <header style={styles.header}>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-        <div style={styles.logoText}>Mochi Board</div>
-        <div style={{ fontSize: '10px', color: '#110FFF', letterSpacing: '2px', fontWeight: 'bold', marginTop: '4px' }}>
-          GENLAYER
-        </div>
-      </div>
       <button 
         onClick={() => setShowAdmin(true)} 
         style={{ background: 'none', border: 'none', cursor: 'pointer', opacity: 0.4, fontSize: '20px' }}
