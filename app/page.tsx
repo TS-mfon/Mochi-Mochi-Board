@@ -179,7 +179,7 @@ export default function MochiBoard() {
         </button>
       </div>
 
-      <p style={styles.footer}>POWERED BY GENLAYER AI</p>
+      <p style={styles.footer}>Made By Gen. Dave</p>
 
       {showAdmin && (
         <div style={{ position: 'fixed' as const, inset: 0, backgroundColor: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
