@@ -1,4 +1,5 @@
 "use client";
+import Image from 'next/image';
 import ReactMarkdown from 'react-markdown';
 import React, { useState, useEffect } from 'react';
 
@@ -127,10 +128,17 @@ export default function MochiBoard() {
     <div style={styles.container}>
       <header style={styles.header}>
         <div style={styles.logoContainer}>
-          <img src="/genlayer-logo.png" alt="Logo" style={{ height: '32px', width: 'auto', filter: 'invert(1)' }} />
+          <Image 
+            src="/logo.png" // Ensure this matches your public folder exactly
+            alt="GenLayer Logo" 
+            width={32} 
+            height={32} 
+            style={{ filter: 'invert(1)', objectFit: 'contain' }} 
+            priority // This tells Next.js to load the logo immediately
+          />
           <div style={styles.logoText}>Mochi Board</div>
         </div>
-        <button onClick={() => setShowAdmin(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', opacity: 0.4 }}>⚙️</button>
+        <button onClick={() => setShowAdmin(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', opacity: 0.8 }}>⚙️</button>
       </header>
 
       <div style={styles.chatPanel}>
