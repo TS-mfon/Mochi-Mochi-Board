@@ -125,21 +125,20 @@ export default function MochiBoard() {
   };
 
   return (
-    <div style={styles.container}>
-      <header style={styles.header}>
-        <div style={styles.logoContainer}>
-          <Image 
-            src="/logo.png" // Ensure this matches your public folder exactly
-            alt="GenLayer Logo" 
-            width={32} 
-            height={32} 
-            style={{ filter: 'invert(1)', objectFit: 'contain' }} 
-            priority // This tells Next.js to load the logo immediately
-          />
-          <div style={styles.logoText}>Mochi Board</div>
+    <header style={styles.header}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+        <div style={styles.logoText}>Mochi Board</div>
+        <div style={{ fontSize: '10px', color: '#110FFF', letterSpacing: '2px', fontWeight: 'bold', marginTop: '4px' }}>
+          GENLAYER
         </div>
-        <button onClick={() => setShowAdmin(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', opacity: 0.8 }}>⚙️</button>
-      </header>
+      </div>
+      <button 
+        onClick={() => setShowAdmin(true)} 
+        style={{ background: 'none', border: 'none', cursor: 'pointer', opacity: 0.4, fontSize: '20px' }}
+      >
+        ⚙️
+      </button>
+    </header>
 
       <div style={styles.chatPanel}>
         {chat.length === 0 && (
